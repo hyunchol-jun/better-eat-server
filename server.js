@@ -1,4 +1,5 @@
 const express = require("express");
+const knex = require("knex")(require("./knexfile"));
 const cors = require("cors");
 require("dotenv").config();
 
