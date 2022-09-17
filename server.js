@@ -14,6 +14,16 @@ app.get("/", (req, res) => {
     res.send("Hello World");
 })
 
+app.get("/users", (req, res) => {
+    knex("users")
+        .then(userData => {
+            res.json(userData);
+        })
+        .catch(error => {
+            res.status(500).json({error});
+        })
+});
+
 app.listen(PORT, () => {
     console.log("Server running on PORT: ", PORT);
 })
