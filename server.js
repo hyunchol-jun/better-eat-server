@@ -75,6 +75,13 @@ app.post("/signup", async (req, res) => {
                 });
             })
             .catch((error) => {
+                if (error.code === "ER_DUP_ENTRY") {
+                    return res.status(400).json({
+                        success: false,
+                        message: "This email is already taken. Try with a different one."
+                    })
+                }
+
                 res.status(500).json({
                     success: false,
                     message: error
