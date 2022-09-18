@@ -55,7 +55,10 @@ app.post("/login", (req, res) => {
         let token = jwt.sign({ email: email }, process.env.JWT_SECRET);
         res.json({ token });
     } else {
-        res.status(401).json({ token: null });
+        res.status(401).json({
+            success: false,
+            message: "Email/password combination is wrong."
+        });
     }
 })
 
