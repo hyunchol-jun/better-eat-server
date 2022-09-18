@@ -5,45 +5,18 @@ const bcrypt = require("bcrypt");
 const cors = require("cors");
 require("dotenv").config();
 
+const PORT = process.env.PORT || 8080;
+
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-const PORT = process.env.PORT || 8080;
-
-const authorize = (req, res, next) => {
-    const authHeader = req.headers.authorization;
-
-    if (!authHeader) 
-        return res.status(401).json({
-            success: false, 
-            message: "This route requires authorization header."
-        });
-
-    if (authHeader.indexOf("Bearer") === -1)
-        return res.status(401).json({
-            success: false,
-            message: "This route requires Bearer token."
-        });
-
-    const token = authHeader.split(" ")[1]; // Remove Bearer string to get the token
-    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-        if (err) {
-            return res.status(401)
-                    .json({ 
-                        success: false,
-                        message: "The token is invalid."
-                    });
-        } 
-
-        req.decoded = decoded;
-        next();
-    });
-};
+const usersRoutes = require("./routes/usersRoutes");
+app.use("/users", usersRoutes);
 
 app.get("/", (req, res) => {
     res.send("Hello World");
-})
+});
 
 app.post("/signup", async (req, res) => {
     const { name, email, password } = req.body;
@@ -141,18 +114,6 @@ app.post("/login", (req, res) => {
             return res.status(500).json({error});
         });
 })
-
-app.get("/users", authorize, (req, res) => {
-    knex
-        .from("users")
-        .select("id", "email", "name")
-        .then(userData => {
-            res.json(userData);
-        })
-        .catch(error => {
-            res.status(500).json({error});
-        })
-});
 
 app.listen(PORT, () => {
     console.log("Server running on PORT: ", PORT);
