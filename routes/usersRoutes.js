@@ -33,7 +33,7 @@ const authorize = (req, res, next) => {
     });
 };
 
-router.get("/", authorize, (req, res) => {
+const getAllUsers = (req, res) => {
     knex
         .from("users")
         .select("id", "email", "name")
@@ -43,6 +43,8 @@ router.get("/", authorize, (req, res) => {
         .catch(error => {
             res.status(500).json({error});
         })
-});
+};
+
+router.get("/", authorize, getAllUsers);
 
 module.exports = router;

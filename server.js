@@ -18,7 +18,7 @@ app.get("/", (req, res) => {
     res.send("Hello World");
 });
 
-app.post("/signup", async (req, res) => {
+const signUpUser = async (req, res) => {
     const { name, email, password } = req.body;
 
     if (!name || !email || !password)
@@ -62,9 +62,9 @@ app.post("/signup", async (req, res) => {
             });
     });
 
-})
+}
 
-app.post("/login", (req, res) => {
+const logInUser = (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password)
@@ -113,7 +113,10 @@ app.post("/login", (req, res) => {
         .catch(error => {
             return res.status(500).json({error});
         });
-})
+};
+
+app.post("/signup", signUpUser);
+app.post("/login", logInUser);
 
 app.listen(PORT, () => {
     console.log("Server running on PORT: ", PORT);
