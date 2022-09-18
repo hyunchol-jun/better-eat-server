@@ -1,4 +1,4 @@
-const knex = require("knex")(require("../knexfile"));
+const userModel = require("../models/userModel");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
@@ -43,42 +43,40 @@ const signUpUser = async (req, res) => {
 
     // Hash password
     const saltRounds = 10;
-    bcrypt.hash(password, saltRounds, (error, hashedPassword) => {
-        if (error) {
-            return res.status(500).json({
+    let hashedPassword = "";
+    try {
+        hashedPassword = await bcrypt.hash(password, saltRounds);
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Unable to perform the sign up. Please try again."
+        });
+
+    }
+
+    try {
+        await userModel.setOne({name, email, passwordHash: hashedPassword});
+    } catch (error) {
+        if (error.code === "ER_DUP_ENTRY") {
+            return res.status(400).json({
                 success: false,
-                message: error
-            });
+                message: "This email is already taken. Try with a different one."
+            })
         }
 
-        knex("users")
-            .insert({
-                name, email, password: hashedPassword
-            })
-            .then(() => {
-                res.json({ 
-                    success: 'true',
-                    message: "Successfully signed up."
-                });
-            })
-            .catch((error) => {
-                if (error.code === "ER_DUP_ENTRY") {
-                    return res.status(400).json({
-                        success: false,
-                        message: "This email is already taken. Try with a different one."
-                    })
-                }
+        res.status(500).json({
+            success: false,
+            message: error
+        });
+    }
 
-                res.status(500).json({
-                    success: false,
-                    message: error
-                });
-            });
+    res.json({
+        success: 'true',
+        message: "Successfully signed up."
     });
-
 }
 
-const logInUser = (req, res) => {
+const logInUser = async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password)
@@ -87,46 +85,48 @@ const logInUser = (req, res) => {
             message: "All fields are required."
         });
 
-    knex("users")
-        .where({ email: email })
-        .then(foundUsers => {
-            if (foundUsers.length !== 1) {
-                return res.status(401).json({
-                    success: false,
-                    message: "Invalid login credentials."
-                });
-            }
-            
-            const user = foundUsers[0];
+    let foundUsers = [];
+    try {
+        foundUsers = await userModel.getOne({email: email});
+    } catch (error) {
+        return res.status(500).json({error});
+    }
 
-            bcrypt.compare(password, user.password, (error, result) => {
-                if (error) {
-                    return res.status(500).json({
-                        success: false,
-                        message: error
-                    });
-                }
-
-                if (!result) {
-                    return res.status(401).json({
-                        success: false,
-                        message: "Invalid login credentials."
-                    });
-                }
-                const token = jwt.sign({ 
-                    email: email
-                }, process.env.JWT_SECRET);
-
-                res.json({ 
-                    success: true,
-                    message: "Successfully logged in.",
-                    token 
-                });
-            })
-        })
-        .catch(error => {
-            return res.status(500).json({error});
+    if (foundUsers.length !== 1) {
+        return res.status(401).json({
+            success: false,
+            message: "Invalid login credentials."
         });
+    }
+    
+    const user = foundUsers[0];
+
+    let isValidPassword = false;
+    try {
+        isValidPassword = await bcrypt.compare(password, user.passwordHash);
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error
+        });
+    }
+
+    if (!isValidPassword) {
+        return res.status(401).json({
+            success: false,
+            message: "Invalid login credentials."
+        });
+    }
+
+    const token = jwt.sign({ 
+        email: email
+    }, process.env.JWT_SECRET);
+
+    res.json({ 
+        success: true,
+        message: "Successfully logged in.",
+        token 
+    });
 };
 
 module.exports = {authorize, signUpUser, logInUser};
