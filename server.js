@@ -143,7 +143,9 @@ app.post("/login", (req, res) => {
 })
 
 app.get("/users", authorize, (req, res) => {
-    knex("users")
+    knex
+        .from("users")
+        .select("id", "email", "name")
         .then(userData => {
             res.json(userData);
         })
