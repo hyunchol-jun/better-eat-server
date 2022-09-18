@@ -11,14 +11,27 @@ app.use(express.json());
 const PORT = process.env.PORT || 8080;
 
 const authorize = (req, res, next) => {
-    const authHeader = req.headers.authorization || "";
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader) 
+        return res.status(401).json({
+            success: false, 
+            message: "This route requires authorization header."
+        });
+
+    if (authHeader.indexOf("Bearer") === -1)
+        return res.status(401).json({
+            success: false,
+            message: "This route requires Bearer token."
+        });
+
     const token = authHeader.split(" ")[1]; // Remove Bearer string to get the token
-    jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
         if (err) {
             return res.status(401)
                     .json({ 
                         success: false,
-                        message: "Token is invalid."
+                        message: "The token is invalid."
                     });
         } 
 
@@ -39,7 +52,7 @@ app.post("/signup", (req, res) => {
 app.post("/login", (req, res) => {
     const { email, password } = req.body;
     if (email && password) {
-        let token = jwt.sign({ email: email }, process.env.SECRET_KEY);
+        let token = jwt.sign({ email: email }, process.env.JWT_SECRET);
         res.json({ token });
     } else {
         res.status(401).json({ token: null });
