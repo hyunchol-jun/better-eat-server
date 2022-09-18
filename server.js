@@ -56,11 +56,11 @@ app.post("/signup", async (req, res) => {
 
     // Hash password
     const saltRounds = 10;
-    bcrypt.hash(password, saltRounds, (err, hashedPassword) => {
-        if (err) {
+    bcrypt.hash(password, saltRounds, (error, hashedPassword) => {
+        if (error) {
             return res.status(500).json({
                 success: false,
-                message: err
+                message: error
             });
         }
 
@@ -95,25 +95,44 @@ app.post("/login", (req, res) => {
 
     knex("users")
         .where({ email: email })
-        .then(rows => {
-            const user = rows[0];
+        .then(foundUsers => {
+            if (foundUsers.length !== 1) {
+                return res.status(401).json({
+                    success: false,
+                    message: "Invalid login credentials."
+                });
+            }
+            
+            const user = foundUsers[0];
 
-            if (user && user.password === password) {
-                let token = jwt.sign({ 
+            bcrypt.compare(password, user.password, (error, result) => {
+                if (error) {
+                    return res.status(500).json({
+                        success: false,
+                        message: error
+                    });
+                }
+
+                if (!result) {
+                    return res.status(401).json({
+                        success: false,
+                        message: "Invalid login credentials."
+                    });
+                }
+                const token = jwt.sign({ 
                     email: email
                 }, process.env.JWT_SECRET);
 
-                res.json({ token });
-            } else {
-                return res.status(401).json({
-                    success: false,
-                    message: "Login failed. Please check your email and password."
+                res.json({ 
+                    success: true,
+                    message: "Successfully logged in.",
+                    token 
                 });
-            }
+            })
         })
         .catch(error => {
             return res.status(500).json({error});
-        })
+        });
 })
 
 app.get("/users", authorize, (req, res) => {
