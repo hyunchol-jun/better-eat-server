@@ -46,20 +46,58 @@ app.get("/", (req, res) => {
 
 app.post("/signup", (req, res) => {
     const { name, email, password } = req.body;
-    res.json({ success: 'true' });
+
+    if (!name || !email || !password)
+        return res.status(400).json({
+            success: false,
+            message: "All fields are required."
+        });
+
+    knex("users")
+        .insert({
+            name, email, password
+        })
+        .then(() => {
+            res.json({ 
+                success: 'true',
+                message: "Successfully signed up."
+            });
+        })
+        .catch((error) => {
+            res.status(500).json({error});
+        })
 })
 
 app.post("/login", (req, res) => {
     const { email, password } = req.body;
-    if (email && password) {
-        let token = jwt.sign({ email: email }, process.env.JWT_SECRET);
-        res.json({ token });
-    } else {
-        res.status(401).json({
+
+    if (!email || !password)
+        return res.status(400).json({
             success: false,
-            message: "Email/password combination is wrong."
+            message: "All fields are required."
         });
-    }
+
+    knex("users")
+        .where({ email: email })
+        .then(rows => {
+            const user = rows[0];
+
+            if (user && user.password === password) {
+                let token = jwt.sign({ 
+                    email: email
+                }, process.env.JWT_SECRET);
+
+                res.json({ token });
+            } else {
+                return res.status(401).json({
+                    success: false,
+                    message: "Login failed. Please check your email and password."
+                });
+            }
+        })
+        .catch(error => {
+            return res.status(500).json({error});
+        })
 })
 
 app.get("/users", authorize, (req, res) => {
