@@ -1,6 +1,7 @@
 const express = require("express");
 const knex = require("knex")(require("./knexfile"));
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 const cors = require("cors");
 require("dotenv").config();
 
@@ -44,7 +45,7 @@ app.get("/", (req, res) => {
     res.send("Hello World");
 })
 
-app.post("/signup", (req, res) => {
+app.post("/signup", async (req, res) => {
     const { name, email, password } = req.body;
 
     if (!name || !email || !password)
@@ -53,19 +54,34 @@ app.post("/signup", (req, res) => {
             message: "All fields are required."
         });
 
-    knex("users")
-        .insert({
-            name, email, password
-        })
-        .then(() => {
-            res.json({ 
-                success: 'true',
-                message: "Successfully signed up."
+    // Hash password
+    const saltRounds = 10;
+    bcrypt.hash(password, saltRounds, (err, hashedPassword) => {
+        if (err) {
+            return res.status(500).json({
+                success: false,
+                message: err
             });
-        })
-        .catch((error) => {
-            res.status(500).json({error});
-        })
+        }
+
+        knex("users")
+            .insert({
+                name, email, password: hashedPassword
+            })
+            .then(() => {
+                res.json({ 
+                    success: 'true',
+                    message: "Successfully signed up."
+                });
+            })
+            .catch((error) => {
+                res.status(500).json({
+                    success: false,
+                    message: error
+                });
+            });
+    });
+
 })
 
 app.post("/login", (req, res) => {
