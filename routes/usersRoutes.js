@@ -1,20 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const authenticationController = require("../controllers/authenticationController");
+const userController = require("../controllers/userController");
 
-const knex = require("knex")(require("../knexfile"));
-const getAllUsers = (req, res) => {
-    knex
-        .from("users")
-        .select("id", "email", "name")
-        .then(userData => {
-            res.json(userData);
-        })
-        .catch(error => {
-            res.status(500).json({error});
-        })
-};
-
-router.get("/", authenticationController.authorize, getAllUsers);
+router.get("/", authenticationController.authorize, userController.getAllUsers);
 
 module.exports = router;
