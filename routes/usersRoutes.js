@@ -5,4 +5,8 @@ const userController = require("../controllers/userController");
 
 router.get("/", authenticationController.authorize, userController.getAllUsers);
 
+router.post("/:userId/recipes", 
+            authenticationController.authorize,
+            userController.setRecipeToUser);
+
 module.exports = router;
