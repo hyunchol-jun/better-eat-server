@@ -4,4 +4,8 @@ const setOne = (recipeInfo) => {
     return knex("recipes").insert(recipeInfo);
 };
 
-module.exports = {setOne};
+const getOne = (apiId) => {
+    return knex("recipes").where({api_id: apiId});
+}
+
+module.exports = {setOne, getOne};
