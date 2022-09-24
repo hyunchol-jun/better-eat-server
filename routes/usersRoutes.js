@@ -13,6 +13,8 @@ router.route("/recipes")
 
 router.route("/groceries")
         .post(authenticationController.authorize,
-                userController.setGroceryItemToUser);
+                userController.setGroceryItemToUser)
+        .get(authenticationController.authorize,
+                userController.getAllUserGroceryItems);
 
 module.exports = router;

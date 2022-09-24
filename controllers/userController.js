@@ -39,7 +39,7 @@ const setRecipeToUser = async (req, res) => {
             message: error
         });
     }
-}
+};
 
 const getAllUserRecipes = async (req, res) => {
     try {
@@ -60,7 +60,7 @@ const getAllUserRecipes = async (req, res) => {
             message: error
         });
     }
-}
+};
 
 const setGroceryItemToUser = async (req, res) => {
     try {
@@ -85,6 +85,34 @@ const setGroceryItemToUser = async (req, res) => {
             message: error
         });
     }
-}
+};
 
-module.exports = {getAllUsers, setRecipeToUser, getAllUserRecipes, setGroceryItemToUser};
+const getAllUserGroceryItems = async (req, res) => {
+    try {
+        const foundUser = await userModel.getOne({email: req.decoded.email});
+
+        if (foundUser.length !== 1) {
+            return res.status(500).json({
+                success: false,
+                message: "Unable to identify the user."
+            });
+        }
+
+        const groceryItems = await groceryListModel.getAll(foundUser[0].id);
+        
+        res.json(groceryItems);
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error
+        });
+    }
+};
+
+module.exports = {
+    getAllUsers, 
+    setRecipeToUser, 
+    getAllUserRecipes, 
+    setGroceryItemToUser,
+    getAllUserGroceryItems
+};
