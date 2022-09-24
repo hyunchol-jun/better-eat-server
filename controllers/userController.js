@@ -120,9 +120,8 @@ const deleteGroceryItemFromUser = async (req, res) => {
             });
         }
 
-        res.json(req.body);
-
         await groceryListModel.removeOne(req.body.id)
+        res.json(req.body);
     } catch (error) {
         res.status(500).json({
             success: false,
