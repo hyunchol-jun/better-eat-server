@@ -15,6 +15,7 @@ router.route("/groceries")
         .post(authenticationController.authorize,
                 userController.setGroceryItemToUser)
         .get(authenticationController.authorize,
-                userController.getAllUserGroceryItems);
-
+                userController.getAllUserGroceryItems)
+        .delete(authenticationController.authorize,
+                userController.deleteGroceryItemFromUser);
 module.exports = router;

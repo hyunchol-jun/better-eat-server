@@ -9,10 +9,9 @@ const getAll = (userId) => {
         .where({user_id: userId});
 }
 
-const removeOne = (userId, itemName) => {
+const removeOne = (itemId) => {
     return knex("grocery_list")
-        .where({user_id: userId})
-        .andWhere({item_name: itemName})
+        .where({id: itemId})
         .del();
 }
 

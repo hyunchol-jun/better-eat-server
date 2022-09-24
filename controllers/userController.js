@@ -109,10 +109,33 @@ const getAllUserGroceryItems = async (req, res) => {
     }
 };
 
+const deleteGroceryItemFromUser = async (req, res) => {
+    try {
+        const foundUser = await userModel.getOne({email: req.decoded.email});
+
+        if (foundUser.length !== 1) {
+            return res.status(500).json({
+                success: false,
+                message: "Unable to identify the user."
+            });
+        }
+
+        res.json(req.body);
+
+        await groceryListModel.removeOne(req.body.id)
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error
+        });
+    }
+};
+
 module.exports = {
     getAllUsers, 
     setRecipeToUser, 
     getAllUserRecipes, 
     setGroceryItemToUser,
-    getAllUserGroceryItems
+    getAllUserGroceryItems,
+    deleteGroceryItemFromUser
 };
