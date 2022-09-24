@@ -9,4 +9,7 @@ router.post("/recipes",
             authenticationController.authorize,
             userController.setRecipeToUser);
 
+router.get("/recipes", 
+            authenticationController.authorize,
+            userController.getAllUserRecipes);
 module.exports = router;

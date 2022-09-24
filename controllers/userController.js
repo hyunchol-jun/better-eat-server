@@ -19,7 +19,6 @@ const setRecipeToUser = async (req, res) => {
         await recipeModel.setOne(req.body);
         const foundRecipe = await recipeModel.getOne(req.body.api_id);
         const foundUser = await userModel.getOne({email: req.decoded.email});
-        console.log(req.decoded)
 
         if (foundRecipe.length !== 1 || foundUser.length !== 1) {
 
@@ -43,4 +42,26 @@ const setRecipeToUser = async (req, res) => {
     }
 }
 
-module.exports = {getAllUsers, setRecipeToUser};
+const getAllUserRecipes = async (req, res) => {
+    try {
+        const foundUser = await userModel.getOne({email: req.decoded.email});
+
+        if (foundUser.length !== 1) {
+
+            return res.status(500).json({
+                success: false,
+                message: "Unable to fetch user's recipes data."
+            });
+        }
+
+        const foundRecipes = await recipeModel.getAll(foundUser[0].id);
+        res.json(foundRecipes);
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error
+        });
+    }
+}
+
+module.exports = {getAllUsers, setRecipeToUser, getAllUserRecipes};
