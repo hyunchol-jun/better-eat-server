@@ -1,6 +1,7 @@
 const userModel = require("../models/userModel");
 const recipeModel = require("../models/recipeModel");
 const recipeUserModel = require("../models/recipeUserModel");
+const groceryListModel = require("../models/groceryListModel");
 
 const getAllUsers = async (req, res) => {
     try {
@@ -20,10 +21,9 @@ const setRecipeToUser = async (req, res) => {
         const foundUser = await userModel.getOne({email: req.decoded.email});
 
         if (foundUser.length !== 1) {
-
             return res.status(500).json({
                 success: false,
-                message: "Unable to set the recipe to the user."
+                message: "Unable to identify the user."
             });
         }
 
@@ -46,10 +46,9 @@ const getAllUserRecipes = async (req, res) => {
         const foundUser = await userModel.getOne({email: req.decoded.email});
 
         if (foundUser.length !== 1) {
-
             return res.status(500).json({
                 success: false,
-                message: "Unable to fetch user's recipes data."
+                message: "Unable to identify the user."
             });
         }
 
@@ -63,4 +62,29 @@ const getAllUserRecipes = async (req, res) => {
     }
 }
 
-module.exports = {getAllUsers, setRecipeToUser, getAllUserRecipes};
+const setGroceryItemToUser = async (req, res) => {
+    try {
+        const foundUser = await userModel.getOne({email: req.decoded.email});
+
+        if (foundUser.length !== 1) {
+            return res.status(500).json({
+                success: false,
+                message: "Unable to identify the user."
+            });
+        }
+
+        await groceryListModel.setOne({
+            user_id: foundUser[0].id,
+            item_name: req.body.itemName
+        });
+        res.json(req.body);
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error
+        });
+    }
+}
+
+module.exports = {getAllUsers, setRecipeToUser, getAllUserRecipes, setGroceryItemToUser};

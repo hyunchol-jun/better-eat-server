@@ -5,11 +5,14 @@ const userController = require("../controllers/userController");
 
 router.get("/", authenticationController.authorize, userController.getAllUsers);
 
-router.post("/recipes", 
-            authenticationController.authorize,
-            userController.setRecipeToUser);
-
-router.get("/recipes", 
-            authenticationController.authorize,
+router.route("/recipes")
+        .post(authenticationController.authorize,
+                userController.setRecipeToUser)
+        .get(authenticationController.authorize,
             userController.getAllUserRecipes);
+
+router.route("/groceries")
+        .post(authenticationController.authorize,
+                userController.setGroceryItemToUser);
+
 module.exports = router;

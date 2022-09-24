@@ -4,8 +4,8 @@ const setOne = (recipeInfo) => {
     return knex("recipes").insert(recipeInfo);
 };
 
-const getOne = (apiId) => {
-    return knex("recipes").where({api_id: apiId});
+const getOne = (recipeId) => {
+    return knex("recipes").where({id: recipeId});
 }
 
 const getAll = (userId) => {
