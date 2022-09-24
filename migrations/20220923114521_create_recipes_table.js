@@ -4,9 +4,8 @@
  */
 exports.up = function(knex) {
     return knex.schema.createTable("recipes", function(table) {
-        table.increments("id");
+        table.integer("id").unsigned().primary();
         table.string("title").notNullable();
-        table.integer("api_id").notNullable().unique();
         table.jsonb("diets");
         table.jsonb("cuisines");
         table.text("instructions");

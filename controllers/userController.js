@@ -17,10 +17,9 @@ const getAllUsers = async (req, res) => {
 const setRecipeToUser = async (req, res) => {
     try {
         await recipeModel.setOne(req.body);
-        const foundRecipe = await recipeModel.getOne(req.body.api_id);
         const foundUser = await userModel.getOne({email: req.decoded.email});
 
-        if (foundRecipe.length !== 1 || foundUser.length !== 1) {
+        if (foundUser.length !== 1) {
 
             return res.status(500).json({
                 success: false,
@@ -29,7 +28,7 @@ const setRecipeToUser = async (req, res) => {
         }
 
         await recipeUserModel.setOne({
-            recipe_id: foundRecipe[0].id,
+            recipe_id: req.body.id,
             user_id: foundUser[0].id
         })
 
