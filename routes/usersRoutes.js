@@ -24,4 +24,8 @@ router.route("/groceries")
                 userController.getAllUserGroceryItems)
         .delete(authenticationController.authorize,
                 userController.deleteGroceryItemFromUser);
+
+router.route("/checkRecipes/:recipeId")
+        .get(authenticationController.authorize,
+                userController.checkRecipeFromUser);
 module.exports = router;

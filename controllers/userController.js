@@ -52,6 +52,31 @@ const setRecipeToUser = async (req, res) => {
     }
 };
 
+const checkRecipeFromUser = async (req, res) => {
+    try {
+        const foundUser = await userModel.getOne({email: req.decoded.email});
+
+        if (foundUser.length !== 1) {
+            return res.status(500).json({
+                success: false,
+                message: "Unable to identify the user."
+            });
+        }
+
+        const numOfRowReturned = await recipeUserModel.getOne({
+            recipe_id: req.params.recipeId,
+            user_id: foundUser[0].id
+        })
+
+        res.json(numOfRowReturned);
+    } catch(error) {
+        res.status(500).json({
+            success: false,
+            message: error
+        });
+    }
+}
+
 const removeRecipeFromUser = async (req, res) => {
     try {
         const foundUser = await userModel.getOne({email: req.decoded.email});
@@ -207,5 +232,6 @@ module.exports = {
     setGroceryItemToUser,
     getAllUserGroceryItems,
     deleteGroceryItemFromUser,
-    removeRecipeFromUser
+    removeRecipeFromUser,
+    checkRecipeFromUser
 };
