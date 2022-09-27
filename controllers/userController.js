@@ -62,6 +62,33 @@ const getAllUserRecipes = async (req, res) => {
     }
 };
 
+const getUserRecipe = async (req, res) => {
+    try {
+        const foundUser = await userModel.getOne({email: req.decoded.email});
+        if (foundUser.length !== 1) {
+            return res.status(500).json({
+                success: false,
+                message: "Unable to identify the user."
+            });
+        }
+
+        const foundRecipe = await recipeModel.getOne(req.params.recipeId);
+        if (foundRecipe.length !== 1) {
+            return res.status(500).json({
+                success: false,
+                message: "Unable to identify the user."
+            });
+        }
+
+        res.json(foundRecipe[0]);
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error
+        });
+    }
+}
+
 const setGroceryItemToUser = async (req, res) => {
     try {
         const foundUser = await userModel.getOne({email: req.decoded.email});
@@ -134,6 +161,7 @@ module.exports = {
     getAllUsers, 
     setRecipeToUser, 
     getAllUserRecipes, 
+    getUserRecipe,
     setGroceryItemToUser,
     getAllUserGroceryItems,
     deleteGroceryItemFromUser

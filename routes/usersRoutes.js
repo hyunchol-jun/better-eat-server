@@ -11,6 +11,10 @@ router.route("/recipes")
         .get(authenticationController.authorize,
             userController.getAllUserRecipes);
 
+router.route("/recipes/:recipeId")
+        .get(authenticationController.authorize,
+                userController.getUserRecipe);
+
 router.route("/groceries")
         .post(authenticationController.authorize,
                 userController.setGroceryItemToUser)

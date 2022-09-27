@@ -11,7 +11,7 @@ exports.up = function(knex) {
         table.text("instructions");
         table.string("image");
         table.integer("ready_min");
-        table.jsonb("ingredients");
+        table.jsonb("extendedIngredients");
     });
 };
 
