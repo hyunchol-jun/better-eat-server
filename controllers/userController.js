@@ -74,9 +74,9 @@ const getUserRecipe = async (req, res) => {
 
         const foundRecipe = await recipeModel.getOne(req.params.recipeId);
         if (foundRecipe.length !== 1) {
-            return res.status(500).json({
+            return res.status(404).json({
                 success: false,
-                message: "Unable to identify the user."
+                message: "Recipe not found."
             });
         }
 
