@@ -107,9 +107,15 @@ const setGroceryItemToUser = async (req, res) => {
         res.json(req.body);
 
     } catch (error) {
+        if (error.code === "ER_DUP_ENTRY") {
+            return res.status(400).json({
+                success: false,
+                message: "Already saved"
+            })
+        }
         res.status(500).json({
             success: false,
-            message: error
+            message: "Server error"
         });
     }
 };
