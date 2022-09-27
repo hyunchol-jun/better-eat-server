@@ -18,6 +18,11 @@ const getAllUsers = async (req, res) => {
 const setRecipeToUser = async (req, res) => {
     try {
         await recipeModel.setOne(req.body);
+    } catch (error) {
+        console.log(error);
+    }
+
+    try {
         const foundUser = await userModel.getOne({email: req.decoded.email});
 
         if (foundUser.length !== 1) {
