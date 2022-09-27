@@ -4,4 +4,8 @@ const setOne = (recipeUserInfo) => {
     return knex("recipe_user").insert(recipeUserInfo);
 };
 
-module.exports = {setOne};
+const removeOne = (recipeUserInfo) => {
+    return knex("recipe_user").where(recipeUserInfo).del();
+}
+
+module.exports = {setOne, removeOne};

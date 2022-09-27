@@ -34,12 +34,43 @@ const setRecipeToUser = async (req, res) => {
 
         res.json(req.body);
     } catch (error) {
+        if (error.code === "ER_DUP_ENTRY") {
+            return res.status(400).json({
+                success: false,
+                message: "Already saved"
+            })
+        }
+        res.status(500).json({
+            success: false,
+            message: "Server error"
+        });
+    }
+};
+
+const removeRecipeFromUser = async (req, res) => {
+    try {
+        const foundUser = await userModel.getOne({email: req.decoded.email});
+
+        if (foundUser.length !== 1) {
+            return res.status(500).json({
+                success: false,
+                message: "Unable to identify the user."
+            });
+        }
+
+        const numOfRowAffected = await recipeUserModel.removeOne({
+            recipe_id: req.params.recipeId,
+            user_id: foundUser[0].id
+        })
+
+        res.json(numOfRowAffected);
+    } catch(error) {
         res.status(500).json({
             success: false,
             message: error
         });
     }
-};
+}
 
 const getAllUserRecipes = async (req, res) => {
     try {
@@ -170,5 +201,6 @@ module.exports = {
     getUserRecipe,
     setGroceryItemToUser,
     getAllUserGroceryItems,
-    deleteGroceryItemFromUser
+    deleteGroceryItemFromUser,
+    removeRecipeFromUser
 };

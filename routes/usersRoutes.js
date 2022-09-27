@@ -13,7 +13,9 @@ router.route("/recipes")
 
 router.route("/recipes/:recipeId")
         .get(authenticationController.authorize,
-                userController.getUserRecipe);
+                userController.getUserRecipe)
+        .delete(authenticationController.authorize,
+            userController.removeRecipeFromUser);
 
 router.route("/groceries")
         .post(authenticationController.authorize,
