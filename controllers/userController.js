@@ -161,11 +161,13 @@ const setGroceryItemToUser = async (req, res) => {
             });
         }
 
-        await groceryListModel.setOne({
+        const itemId = await groceryListModel.setOne({
             user_id: foundUser[0].id,
             item_name: req.body.itemName
         });
-        res.json(req.body);
+
+        const returnedItem = await groceryListModel.getOne(itemId);
+        res.json(returnedItem[0]);
 
     } catch (error) {
         if (error.code === "ER_DUP_ENTRY") {
