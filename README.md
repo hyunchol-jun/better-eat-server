@@ -10,6 +10,13 @@ If you want to try in the local server, you can download the project and run:
 
 ### `npm start`
 
+## Tech stack
+- node
+- express.js
+- MySQL
+- Knex.js
+- JWT
+- bcrypt
 
 ## Endpoints
 - `POST /signup`
