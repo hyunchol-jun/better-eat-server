@@ -4,6 +4,11 @@ const setOne = (itemInfo) => {
     return knex("inventory_list").insert(itemInfo);
 };
 
+const getOne = (itemId) => {
+    return knex("inventory_list")
+        .where({id: itemId});
+}
+
 const getAll = (userId) => {
     return knex("inventory_list")
         .where({user_id: userId});
