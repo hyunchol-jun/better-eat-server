@@ -2,6 +2,7 @@ const userModel = require("../models/userModel");
 const recipeModel = require("../models/recipeModel");
 const recipeUserModel = require("../models/recipeUserModel");
 const groceryListModel = require("../models/groceryListModel");
+const inventoryListModel = require("../models/inventoryListModel");
 
 const getAllUsers = async (req, res) => {
     try {
@@ -183,6 +184,36 @@ const setGroceryItemToUser = async (req, res) => {
     }
 };
 
+const setInventoryItemToUser = async (req, res) => {
+    try {
+        const foundUser = await userModel.getOne({email: req.decoded.email});
+
+        if (foundUser.length !== 1) {
+            return res.status(500).json({
+                success: false,
+                message: "Unable to identify the user."
+            });
+        }
+
+        await inventoryListModel.setOne({
+            user_id: foundUser[0].id,
+            item_name: req.body.itemName
+        });
+        res.json(req.body);
+    } catch (error) {
+        if (error.code === "ER_DUP_ENTRY") {
+            return res.status(400).json({
+                success: false,
+                message: "Already saved"
+            })
+        }
+        res.status(500).json({
+            success: false,
+            message: "Server error"
+        });
+    }
+};
+
 const getAllUserGroceryItems = async (req, res) => {
     try {
         const foundUser = await userModel.getOne({email: req.decoded.email});
@@ -197,6 +228,28 @@ const getAllUserGroceryItems = async (req, res) => {
         const groceryItems = await groceryListModel.getAll(foundUser[0].id);
         
         res.json(groceryItems);
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error
+        });
+    }
+};
+
+const getAllUserInventoryItems = async (req, res) => {
+    try {
+        const foundUser = await userModel.getOne({email: req.decoded.email});
+
+        if (foundUser.length !== 1) {
+            return res.status(500).json({
+                success: false,
+                message: "Unable to identify the user."
+            });
+        }
+
+        const inventoryItems = await inventoryListModel.getAll(foundUser[0].id);
+        
+        res.json(inventoryItems);
     } catch (error) {
         res.status(500).json({
             success: false,
@@ -226,6 +279,27 @@ const deleteGroceryItemFromUser = async (req, res) => {
     }
 };
 
+const deleteInventoryItemFromUser = async (req, res) => {
+    try {
+        const foundUser = await userModel.getOne({email: req.decoded.email});
+
+        if (foundUser.length !== 1) {
+            return res.status(500).json({
+                success: false,
+                message: "Unable to identify the user."
+            });
+        }
+
+        await inventoryListModel.removeOne(req.body.id)
+        res.json(req.body);
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error
+        });
+    }
+};
+
 module.exports = {
     getAllUsers, 
     setRecipeToUser, 
@@ -234,6 +308,9 @@ module.exports = {
     setGroceryItemToUser,
     getAllUserGroceryItems,
     deleteGroceryItemFromUser,
+    setInventoryItemToUser,
+    getAllUserInventoryItems,
+    deleteInventoryItemFromUser,
     removeRecipeFromUser,
     checkRecipeFromUser
 };
