@@ -23,6 +23,14 @@ router.route("/groceries")
         .delete(authenticationController.authorize,
                 userController.deleteGroceryItemFromUser);
 
+router.route("/inventories")
+        .post(authenticationController.authorize,
+                userController.setInventoryItemToUser)
+        .get(authenticationController.authorize,
+                userController.getAllUserInventoryItems)
+        .delete(authenticationController.authorize,
+                userController.deleteInventoryItemFromUser);
+
 router.route("/checkRecipes/:recipeId")
         .get(authenticationController.authorize,
                 userController.checkRecipeFromUser);
