@@ -164,7 +164,7 @@ const setGroceryItemToUser = async (req, res) => {
 
         await groceryListModel.setOne({
             user_id: foundUser[0].id,
-            item_name: req.body.itemName
+            item_name: req.body.item_name
         });
         res.json(req.body);
 
@@ -195,7 +195,7 @@ const setInventoryItemToUser = async (req, res) => {
 
         await inventoryListModel.setOne({
             user_id: foundUser[0].id,
-            item_name: req.body.itemName
+            item_name: req.body.item_name
         });
         res.json(req.body);
     } catch (error) {
