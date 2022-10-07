@@ -4,9 +4,9 @@ const setOne = (itemInfo) => {
     return knex("grocery_list").insert(itemInfo);
 };
 
-const getOne = (itemId) => {
+const getOne = (userId, itemName) => {
     return knex("grocery_list")
-        .where({id: itemId});
+        .where({user_id: userId, item_name: itemName});
 }
 
 const getAll = (userId) => {
@@ -20,4 +20,4 @@ const removeOne = (itemId) => {
         .del();
 }
 
-module.exports = {setOne, getAll, removeOne};
+module.exports = {setOne, getOne, getAll, removeOne};
