@@ -31,7 +31,12 @@ router.route("/inventories")
         .delete(authenticationController.authorize,
                 userController.deleteInventoryItemFromUser);
 
+router.route("/inventories/check")
+        .post(authenticationController.authorize,
+                userController.checkIfItemsAreInStock);
+
 router.route("/checkRecipes/:recipeId")
         .get(authenticationController.authorize,
                 userController.checkRecipeFromUser);
+
 module.exports = router;
