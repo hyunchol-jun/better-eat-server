@@ -177,6 +177,7 @@ const setGroceryItemToUser = async (req, res) => {
                 message: "Already saved"
             })
         }
+        console.log(error)
         res.status(500).json({
             success: false,
             message: "Server error"
@@ -216,6 +217,32 @@ const setInventoryItemToUser = async (req, res) => {
         });
     }
 };
+
+const checkIfItemsAreInStock = async (req, res) => {
+    try {
+        const foundUser = await userModel.getOne({email: req.decoded.email});
+
+        if (foundUser.length !== 1) {
+            return res.status(500).json({
+                success: false,
+                message: "Unable to identify the user."
+            });
+        }
+
+        const userHasItemArray = [];
+        for (let item of req.body) {
+            const foundItemArray = await inventoryListModel.getOne(foundUser[0].id, item);
+            userHasItemArray.push(foundItemArray.length > 0);
+        }
+
+        res.json(userHasItemArray);
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Server error"
+        });
+    }
+}
 
 const getAllUserGroceryItems = async (req, res) => {
     try {
@@ -315,5 +342,6 @@ module.exports = {
     getAllUserInventoryItems,
     deleteInventoryItemFromUser,
     removeRecipeFromUser,
-    checkRecipeFromUser
+    checkRecipeFromUser,
+    checkIfItemsAreInStock
 };
