@@ -231,7 +231,7 @@ const checkIfItemsAreInStock = async (req, res) => {
 
         const userHasItemArray = [];
         for (let item of req.body) {
-            const foundItemArray = await inventoryListModel.getOne(foundUser[0].id, item);
+            const foundItemArray = await inventoryListModel.getOne(foundUser[0].id, item.toLowerCase());
             userHasItemArray.push(foundItemArray.length > 0);
         }
 
